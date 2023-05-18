@@ -1,0 +1,14 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// This model defines the structure of the data that you can write and read
+model User {
+  id   String @id @default(uuid())
+  name String
+}
