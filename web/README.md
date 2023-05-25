@@ -1,5 +1,6 @@
-# TimeLine Memories Front-end
-Project to save memories in a timeline
+<div>
+  <h1 align="center">Front-end</h1>
+</div>
 
 ## Front-end:
 - ReactJS + NextJS

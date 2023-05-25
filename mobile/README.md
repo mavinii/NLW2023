@@ -1,5 +1,6 @@
-# TimeLine Memories Mobile Application
-Project to save memories in a timeline
+<div>
+  <h1 align="center">Mobile</h1>
+</div>
 
 ## Mobile:
 - Expo
