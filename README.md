@@ -21,7 +21,7 @@ Clique [here](#) to see the Back-end documentation.
 ## Front-end
 - ReactJS + NextJS
 - TailwindCSS
-- ESLint + Prettier Tailwind`
+- ESLint + Prettier Tailwind
 
 Clique [here](#) to see the Front-end documentation.
 
