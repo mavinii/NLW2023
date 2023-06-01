@@ -9,6 +9,25 @@ datasource db {
 
 // This model defines the structure of the data that you can write and read
 model User {
-  id   String @id @default(uuid())
-  name String
+  id        String @id @default(uuid())
+  githubID  Int    @unique
+  name      String
+  login     String
+  avatarUrl String
+
+  // Relation to Memory
+  memories Memory[]
+}
+
+model Memory {
+  id     String @id @default(uuid())
+  userId String
+
+  coverUrl  String // image or video of the memory
+  content   String // text of the memory
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relation to User
+  user User @relation(fields: [userId], references: [id])
 }
