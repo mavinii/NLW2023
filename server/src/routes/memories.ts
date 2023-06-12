@@ -4,14 +4,26 @@ import { prisma } from '../lib/prisma'
 
 // This is a function that receives the app instance for routes registration
 export async function memoriesRoutes(app: FastifyInstance) {
+  // Before all routes, verify if the user is authenticated
+  app.addHook('preHandler', async (request) => {
+    try {
+      await request.jwtVerify()
+    } catch (err) {
+      console.log(err)
+    }
+  })
+
   /**
-   * Get all memories posts
-   * This route lists all memories
+   * Verify with JWT token if user is authenticated
+   * if so, list all memories
    * Orders the memories by createdAt
    * Maps the memories to a new array of objects and concatenates the content
    */
-  app.get('/memories', async () => {
+  app.get('/memories', async (request) => {
     const memories = await prisma.memory.findMany({
+      where: {
+        userId: request.user.sub,
+      },
       orderBy: {
         createdAt: 'asc',
       },
@@ -27,9 +39,10 @@ export async function memoriesRoutes(app: FastifyInstance) {
   /**
    * This route lists a specific memory by id
    * This validates the id param with zod
+   * User can only see their own memories
    * Find a unique id of throw an error
    */
-  app.get('/memories/:id', async (request) => {
+  app.get('/memories/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -41,6 +54,12 @@ export async function memoriesRoutes(app: FastifyInstance) {
         id,
       },
     })
+
+    if (!memory.isPublic && memory.userId !== request.user.sub) {
+      return reply.status(401).send({
+        error: 'You are not authorized to see this memory',
+      })
+    }
 
     return memory
   })
@@ -65,7 +84,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
         content,
         coverUrl,
         isPublic,
-        userId: '5fa9e4e1-ea5f-4198-8072-5bca212a10b7',
+        userId: request.user.sub,
       },
     })
 
@@ -79,7 +98,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
    * Second: validates the content, coverUrl and isPublic param with zod
    * And then it does the update and returns the updated memory
    */
-  app.put('/memories/:id', async (request) => {
+  app.put('/memories/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -94,7 +113,19 @@ export async function memoriesRoutes(app: FastifyInstance) {
 
     const { content, coverUrl, isPublic } = bodySchema.parse(request.body)
 
-    const updatedMemory = await prisma.memory.update({
+    let updatedMemory = await prisma.memory.findUniqueOrThrow({
+      where: {
+        id,
+      },
+    })
+
+    if (updatedMemory.userId !== request.user.sub) {
+      return reply.status(401).send({
+        error: 'You are not authorized to update this memory',
+      })
+    }
+
+    updatedMemory = await prisma.memory.update({
       where: {
         id,
       },
@@ -113,12 +144,24 @@ export async function memoriesRoutes(app: FastifyInstance) {
    * This validates the id param with zod
    * Find a unique id and delete it or throw an error
    */
-  app.delete('/memories/:id', async (request) => {
+  app.delete('/memories/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
 
     const { id } = paramsSchema.parse(request.params)
+
+    const deleteMemory = await prisma.memory.findUniqueOrThrow({
+      where: {
+        id,
+      },
+    })
+
+    if (deleteMemory.userId !== request.user.sub) {
+      return reply.status(401).send({
+        error: 'You are not authorized to update this memory',
+      })
+    }
 
     await prisma.memory.delete({
       where: {
