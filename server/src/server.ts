@@ -1,6 +1,9 @@
+import 'dotenv/config'
+
 import fastify from 'fastify'
 import cors from '@fastify/cors'
 import { memoriesRoutes } from './routes/memories'
+import { authRoutes } from './routes/auth'
 
 const app = fastify()
 
@@ -8,8 +11,11 @@ app.register(cors, {
   origin: true,
 })
 
-// This allows Prisma to register archives of routes separated by files
+// Routes separated by files
 app.register(memoriesRoutes)
+
+// The OAhth of GitHub as route
+app.register(authRoutes)
 
 // Fastify routes using promises
 app
