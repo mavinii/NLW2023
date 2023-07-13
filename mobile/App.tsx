@@ -14,6 +14,7 @@ import blurBg from './src/assets/bg-blur.png'
 import Stripes from './src/assets/stripes.svg'
 import TLMLogo from './src/assets/tlm-logo.svg'
 import { styled } from 'nativewind'
+// import { useEffect } from 'react'
 
 const StylledStripes = styled(Stripes)
 
@@ -24,6 +25,13 @@ export default function App() {
     Roboto_700Bold,
     BaiJamjuree_700Bold,
   })
+
+  // 1H and 29min
+  // useEffect(() => {
+  //   if (response.status === 200) {
+  //     console.log('response', response)
+  //   }
+  // })
 
   // If the fonts have not been loaded, the app will not be rendered
   if (!hasFontsLoaded) {

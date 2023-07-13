@@ -16,19 +16,18 @@ app.register(jwt, {
   secret: 'timeline-memories',
 })
 
-// Routes separated by files
-app.register(memoriesRoutes)
-
 // The OAhth of GitHub as route
 app.register(authRoutes)
+
+// Routes separated by files
+app.register(memoriesRoutes)
 
 // Fastify routes using promises
 app
   .listen({
     port: 3333,
+    host: '0.0.0.0',
   })
-  .then(() => console.log('Server is running on port http://localhost:3333'))
-  .catch((err) => {
-    console.log(err)
-    process.exit(1)
+  .then(() => {
+    console.log('HTTP server running on http://localhost:3333')
   })
