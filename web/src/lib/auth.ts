@@ -1,20 +1,63 @@
-import jwtDecode from 'jwt-decode'
-import { cookies } from 'next/headers'
+import { NextAuthOptions, getServerSession } from 'next-auth'
+import { useSession } from 'next-auth/react'
+import { redirect, useRouter } from 'next/navigation'
 
-interface UserInfo {
-  sub: string
-  name: string
-  avatarUrl: string
+import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
+import GithubProvider from 'next-auth/providers/github'
+
+// import prisma from './prisma'
+
+export const authConfig: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: 'Sign in',
+      credentials: {
+        email: {
+          label: 'Email',
+          type: 'email',
+          placeholder: 'example@example.com',
+        },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        if (!credentials || !credentials.email || !credentials.password)
+          return null
+
+        // const dbUser = await prisma.user.findFirst({
+        //   where: { email: credentials.email },
+        // })
+
+        // if (dbUser && dbUser.password === credentials.password) {
+        //   const { password, createdAt, id, ...dbUserWithoutPassword } = dbUser
+        //   return dbUserWithoutPassword as User
+        // }
+
+        return null
+      },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
+    GithubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+    }),
+  ],
 }
 
-export function getUserInfo(): UserInfo {
-  const token = cookies().get('token')?.value
+export async function loginIsRequiredServer() {
+  const session = await getServerSession(authConfig)
+  if (!session) return redirect('/login')
+}
 
-  if (!token) {
-    throw new Error('No token found')
+export function loginIsRequiredClient() {
+  if (typeof window === 'undefined') {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const session = useSession()
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const router = useRouter()
+    if (!session) router.push('/')
   }
-
-  const user = jwtDecode(token) as UserInfo
-
-  return user
 }

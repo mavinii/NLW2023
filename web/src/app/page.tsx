@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 
-import { SignIn } from '@/components/Signin'
+// import { SignIn } from '@/components/Signin'
 import { Hero } from '@/components/Hero'
 import { Copyright } from '@/components/Copyright'
 import { EmptyMemories } from '@/components/EmptyMemories'
@@ -19,7 +19,8 @@ export default function Home() {
         {/* Stripes */}
         <div className="absolute bottom-0 right-2 top-0 w-2 bg-stripes" />
 
-        {isAuthenticated ? <Profile /> : <SignIn />}
+        {/* UNCOMMENT this line when the Signed page is created */}
+        {/* {isAuthenticated ? <Profile /> : <SignIn />} */}
 
         <Hero />
         <Copyright />
@@ -28,6 +29,7 @@ export default function Home() {
       {/* Right Column */}
       <div className="flex flex-col p-16">
         <EmptyMemories />
+        {/* <SignIn /> */}
       </div>
     </main>
   )
